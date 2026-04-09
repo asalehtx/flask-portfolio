@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="dashboard-container">
+        <h2>Personal Finance Dashboard</h2>
+        
+        <div id="alert-box" style="color: #d9534f; font-weight: bold; margin-bottom: 20px;"></div>
+
+        <div style="width: 400px; height: 400px; margin: 0 auto;">
+            <canvas id="expenseChart"></canvas>
+        </div>
+        
+        <br>
+        <a href="{{ url_for('export_transactions_csv') }}" class="button" target="_blank">Download CSV Report</a>
+        <br><br>
+        <a href="{{ url_for('home') }}">&larr; Back to Projects</a>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+        // Use the Fetch API to call your Flask backend
+        fetch('/api/finance/summary')
+            .then(response => response.json()) // Convert the response to JSON
+            .then(data => {
+                
+                // --- HANDLE ALERTS ---
+                const alertBox = document.getElementById('alert-box');
+                if (data.budget_alerts.length > 0) {
+                    data.budget_alerts.forEach(alertMsg => {
+                        let p = document.createElement('p');
+                        p.textContent = '⚠️ ' + alertMsg;
+                        alertBox.appendChild(p);
+                    });
+                }
+
+                // --- HANDLE THE CHART ---
+                // Extract the categories (keys) and amounts (values) from your API data
+                const categories = Object.keys(data.chart_data);
+                const amounts = Object.values(data.chart_data);
+
+                // Target the canvas element
+                const ctx = document.getElementById('expenseChart').getContext('2d');
+
+                // Draw the pie chart
+                new Chart(ctx, {
+                    type: 'pie',
+                    data: {
+                        labels: categories,
+                        datasets: [{
+                            label: 'Amount Spent ($)',
+                            data: amounts,
+                            // Give each slice a nice color
+                            backgroundColor: [
+                                'rgba(255, 99, 132, 0.7)', // Pink/Red
+                                'rgba(54, 162, 235, 0.7)', // Blue
+                                'rgba(255, 206, 86, 0.7)'  // Yellow
+                            ],
+                            borderColor: [
+                                'rgba(255, 99, 132, 1)',
+                                'rgba(54, 162, 235, 1)',
+                                'rgba(255, 206, 86, 1)'
+                            ],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                            },
+                            title: {
+                                display: true,
+                                text: 'Expenses by Category'
+                            }
+                        }
+                    }
+                });
+            })
+            .catch(error => console.error('Error fetching data:', error));
+    </script>
+{% endblock %}

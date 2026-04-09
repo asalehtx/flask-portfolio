@@ -1,3 +1,25 @@
+import csv
+import io
+from flask import Flask, render_template, jsonify, request, Response
+
+# ... (your existing code) ...
+
+# --- MOCK DB: FINANCE APP ---
+
+TRANSACTIONS_DB = [
+    {"id": 1, "type": "income", "amount": 5000.00, "category": "Salary", "date": "2026-04-01"},
+    {"id": 2, "type": "expense", "amount": 1200.00, "category": "Rent", "date": "2026-04-02"},
+    {"id": 3, "type": "expense", "amount": 300.00, "category": "Groceries", "date": "2026-04-05"},
+    {"id": 4, "type": "expense", "amount": 150.00, "category": "Entertainment", "date": "2026-04-08"}
+]
+
+# Monthly budget limits per category
+BUDGETS_DB = {
+    "Rent": 1200.00,
+    "Groceries": 250.00, # Deliberately set low to trigger an alert!
+    "Entertainment": 200.00
+}
+
 # --- MOCK DB: SUBSCRIPTIONS & CONTENT ---
 
 # All available topics users can subscribe to
@@ -51,6 +73,14 @@ PROJECTS = [
         "tech_stack": ["Python", "Flask", "Data Filtering"],
         "github_url": "https://github.com/asalehtx/flask-portfolio",
         "live_demo": "/api/users/user_1/feed" 
+    },
+    {
+        "id": 3,
+        "title": "Personal Finance Engine",
+        "description": "A financial tracking API that aggregates ledger data, checks spending against dynamic budget limits, issues overspending alerts, and generates downloadable CSV reports.",
+        "tech_stack": ["Python", "Flask", "Data Aggregation", "CSV Generation"],
+        "github_url": "https://github.com/asalehtx/flask-portfolio",
+        "live_demo": "/api/finance/summary" 
     }
 ]
 
@@ -182,6 +212,84 @@ def get_recommendations(user_id):
         "message": "Topics you might like",
         "data": recommended_topics
     }), 200
+
+# --- FINANCE TRACKER API ---
+
+@app.route('/api/finance/transactions', methods=['POST'])
+def add_transaction():
+    """Log a new income or expense."""
+    data = request.get_json()
+    
+    new_id = len(TRANSACTIONS_DB) + 1
+    new_transaction = {
+        "id": new_id,
+        "type": data.get("type"), # 'income' or 'expense'
+        "amount": float(data.get("amount", 0)),
+        "category": data.get("category"),
+        "date": data.get("date")
+    }
+    
+    TRANSACTIONS_DB.append(new_transaction)
+    return jsonify({"message": "Transaction added", "data": new_transaction}), 201
+
+@app.route('/api/finance/summary', methods=['GET'])
+def get_finance_summary():
+    """Calculates totals, prepares data for the pie chart, and triggers alerts."""
+    total_income = 0
+    total_expenses = 0
+    spending_by_category = {}
+    alerts = []
+
+    for t in TRANSACTIONS_DB:
+        if t["type"] == "income":
+            total_income += t["amount"]
+        elif t["type"] == "expense":
+            total_expenses += t["amount"]
+            cat = t["category"]
+            spending_by_category[cat] = spending_by_category.get(cat, 0) + t["amount"]
+
+    # Check for budget overspending
+    for category, spent in spending_by_category.items():
+        limit = BUDGETS_DB.get(category)
+        if limit and spent > limit:
+            alerts.append(f"ALERT: You have exceeded your {category} budget by ${spent - limit:.2f}!")
+
+    return jsonify({
+        "summary": {
+            "total_income": total_income,
+            "total_expenses": total_expenses,
+            "net_savings": total_income - total_expenses
+        },
+        "chart_data": spending_by_category, # Use this in your frontend for the pie chart
+        "budget_alerts": alerts
+    }), 200
+
+@app.route('/api/finance/export/csv', methods=['GET'])
+def export_transactions_csv():
+    """Generates and returns a downloadable CSV file of all transactions."""
+    
+    # Create an in-memory string buffer
+    output = io.StringIO()
+    writer = csv.writer(output)
+    
+    # Write the CSV headers
+    writer.writerow(['ID', 'Type', 'Amount', 'Category', 'Date'])
+    
+    # Write the data rows
+    for t in TRANSACTIONS_DB:
+        writer.writerow([t['id'], t['type'], t['amount'], t['category'], t['date']])
+    
+    # Create the Flask response
+    response = Response(output.getvalue(), mimetype='text/csv')
+    # This header tells the browser to download the file instead of just displaying it
+    response.headers['Content-Disposition'] = 'attachment; filename=financial_report.csv'
+    
+    return response
+
+@app.route('/finance-dashboard')
+def finance_dashboard():
+    """Renders the frontend dashboard for the finance app."""
+    return render_template('finance.html')
 
 if __name__ == '__main__':
     app.run(debug=True)
