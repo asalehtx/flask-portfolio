@@ -270,7 +270,21 @@
         
         if (isHidden) {
             // The chat was just opened!
-            document.getElementById('user-input').focus();
+            // Toggle Chat Window visibility
+    function toggleChat() {
+        const chatWindow = document.getElementById('chat-widget-window');
+        const isHidden = chatWindow.style.display === 'none';
+        
+        chatWindow.style.display = isHidden ? 'flex' : 'none';
+        
+        if (isHidden) {
+            // The chat was just opened!
+            startNudgeTimer(); // Start the 10-second clock immediately
+        } else {
+            // The chat was just closed!
+            clearTimeout(nudgeTimer); // Pause the clock so it doesn't trigger in the background
+        }
+    }
             startNudgeTimer(); // Start the 10-second clock immediately
         } else {
             // The chat was just closed!
