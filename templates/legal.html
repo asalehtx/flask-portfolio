@@ -186,6 +186,7 @@
 
 <script>
     let nudgeTimer; // This holds the 10-second countdown
+    let nudgeSent = false; // --- NEW: Remembers if the nudge was already sent ---
 
     // Toggle Chat Window visibility
     function toggleChat() {
@@ -225,7 +226,7 @@
 
         if (!message) return;
 
-        // --- Stop the nudge timer because the user responded ---
+        // Stop the nudge timer because the user responded
         clearTimeout(nudgeTimer);
 
         // 1. Add User Message to UI
@@ -245,7 +246,7 @@
             // 3. Add Bot Reply to UI
             chatBox.innerHTML += `<div class="msg bot">${data.reply}</div>`;
 
-            // --- Start the timer again now that the bot has finished speaking ---
+            // Start the timer again now that the bot has finished speaking
             startNudgeTimer();
 
         } catch (error) {
@@ -260,6 +261,9 @@
         // Clear any existing timer so they don't stack up
         clearTimeout(nudgeTimer);
 
+        // --- NEW: If the nudge was already sent, stop right here! ---
+        if (nudgeSent) return;
+
         // Start a new 10-second countdown
         nudgeTimer = setTimeout(() => {
             const chatBox = document.getElementById('chat-box');
@@ -269,6 +273,9 @@
             if (chatWindow.style.display !== 'none') {
                 chatBox.innerHTML += `<div class="msg bot">I'm here if you have any questions or need help!</div>`;
                 chatBox.scrollTop = chatBox.scrollHeight;
+                
+                // --- NEW: Mark the nudge as sent so it never triggers again ---
+                nudgeSent = true; 
             }
         }, 10000); // 10000 milliseconds = 10 seconds
     }
