@@ -91,6 +91,15 @@ app = Flask(__name__)
 # Sample data representing your projects
 PROJECTS = [
     {
+        "id": 4,
+        "title": "AI Legal Intake Agent",
+        "description": "An intelligent, empathetic chatbot designed for personal injury law firms. Built using the Google Gemini API, it captures leads, validates user distress, and pre-qualifies potential cases through natural conversation before routing them to a human attorney.",
+        "tech_stack": ["Python", "Flask", "Gemini API", "JavaScript", "CSS"],
+        "github_url": "https://github.com/asalehtx/adam-saleh-web-app-portfolio",
+        "live_demo": "/api/chat",
+        "dashboard_url": "/legal-chat"
+    },
+    {
         "id": 3,
         "title": "Personal Finance Dashboard & API",
         "description": "A full-stack financial tracking application. The backend is powered by a Flask REST API that handles data aggregation, checks spending against dynamic budget limits, and generates CSV reports. The frontend features a fully responsive UI with asynchronous CRUD operations and real-time Chart.js data visualization, including categorical pie charts and interactive time-series line graphs with custom data grouping.",
@@ -373,6 +382,10 @@ def legal_chat():
     except Exception as e:
         print(f"Gemini API Error: {e}")
         return jsonify({"reply": "I'm so sorry, we are experiencing a technical issue connecting you right now. Please call our office directly at 832-205-5978.", "status": "error"}), 500
+    
+    @app.route('/legal-chat')
+def legal_chat_page():
+    return render_template('legal.html')
 
 if __name__ == '__main__':
     app.run(debug=True)
