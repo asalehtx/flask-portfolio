@@ -2,8 +2,8 @@ import os
 import csv
 import io
 from flask import Flask, render_template, jsonify, request, Response
-from dotenv import load_dotenv
-import google.generativeai as genai
+from dotenv import load_dotenv # type: ignore
+import google.generativeai as genai # type: ignore
 
 # Load secret variables from the .env file
 load_dotenv()
