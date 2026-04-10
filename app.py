@@ -96,7 +96,6 @@ PROJECTS = [
         "description": "An intelligent, empathetic chatbot designed for personal injury law firms. Built using the Google Gemini API, it captures leads, validates user distress, and pre-qualifies potential cases through natural conversation before routing them to a human attorney.",
         "tech_stack": ["Python", "Flask", "Gemini API", "JavaScript", "CSS"],
         "github_url": "https://github.com/asalehtx/adam-saleh-web-app-portfolio",
-        "live_demo": "/legal-chat",
         "dashboard_url": "/legal-chat",
         "button_label": "Test Live Chat"
     },
