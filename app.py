@@ -97,7 +97,7 @@ PROJECTS = [
         "tech_stack": ["Python", "Flask", "Gemini API", "JavaScript", "CSS"],
         "github_url": "https://github.com/asalehtx/adam-saleh-web-app-portfolio",
         "live_demo": "/api/chat",
-        "live_dashboard_url": "/legal-chat"
+        "live_dashboard_url": "/legal-chat",
         "button_label": "Test Live Chat"
     },
     {
@@ -107,7 +107,7 @@ PROJECTS = [
         "tech_stack": ["Python", "Flask", "JavaScript", "Chart.js", "CSS Flexbox"],
         "github_url": "https://github.com/asalehtx/adam-saleh-web-app-portfolio",
         "live_demo": "/api/finance/summary",
-        "dashboard_url": "/finance-dashboard"
+        "dashboard_url": "/finance-dashboard",
         "button_label": "View Dashboard Demo"
     },
     {
