@@ -3,13 +3,19 @@ import io
 from flask import Flask, render_template, jsonify, request, Response
 
 import os
+from flask import Flask, render_template, jsonify, request, Response
+from dotenv import load_dotenv
 import google.generativeai as genai
 
-# Tell Gemini to use the API key from your environment variables (we will set this up in Railway later)
-# For local testing, you can temporarily replace os.environ.get(...) with your actual "key" (but delete it before pushing to GitHub!)
+# Load secret variables from the .env file
+load_dotenv()
+
+# Configure Gemini with your API key
 genai.configure(api_key=os.environ.get("GEMINI_API_KEY"))
 
-# Define the AI's strict persona and goal
+app = Flask(__name__)
+
+# --- AI CHATBOT SETUP ---
 law_firm_prompt = """You are the empathetic first point of contact for the Rahgozar Law Firm.
 Your goal is to listen to the user's situation, validate their distress, and determine if they have a viable case.
 Ask ONE gentle follow-up question at a time to find out:
@@ -25,7 +31,7 @@ model = genai.GenerativeModel(
     system_instruction=law_firm_prompt
 )
 
-# A simple dictionary to temporarily store active conversations so the AI remembers the context
+# Temporary memory to keep track of active user sessions
 active_chats = {}
 
 # ... (your existing code) ...
