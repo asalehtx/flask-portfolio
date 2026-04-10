@@ -110,7 +110,7 @@
         border-top: 1px solid #eee;
         background: white;
         display: flex;
-        flex-direction: column; /* Stacks disclaimer and input vertically */
+        flex-direction: column; 
     }
 
     .disclaimer-container {
@@ -150,35 +150,35 @@
         gap: 10px;
         align-items: center;
         width: 100%;
+        margin-top: 5px;
     }
 
     #user-input {
-    flex: 1;
-    height: 45px; /* Explicit height */
-    padding: 0 15px; /* Only horizontal padding, height is fixed */
-    border: 1px solid #ddd;
-    border-radius: 25px;
-    font-size: 16px; /* Prevents mobile auto-zoom */
-    outline: none;
-    box-sizing: border-box; /* Crucial: includes padding/border in the 45px height */
-    margin-top: 14px;
-}
+        flex: 1;
+        height: 45px; 
+        padding: 0 15px; 
+        border: 1px solid #ddd;
+        border-radius: 25px;
+        font-size: 16px; /* Prevents mobile auto-zoom */
+        outline: none;
+        box-sizing: border-box; 
+    }
 
     .chat-input-area button {
-    height: 45px; /* Matches input height exactly */
-    background: #007bff;
-    color: white;
-    border: none;
-    padding: 0 20px; /* Horizontal padding for button width */
-    border-radius: 25px;
-    cursor: pointer;
-    font-weight: bold;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-sizing: border-box; /* Crucial: includes padding/border in the 45px height */
-    transition: background 0.2s;
-}
+        height: 45px; 
+        background: #007bff;
+        color: white;
+        border: none;
+        padding: 0 20px; 
+        border-radius: 25px;
+        cursor: pointer;
+        font-weight: bold;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-sizing: border-box; 
+        transition: background 0.2s;
+    }
 
     .chat-input-area button:hover { background: #0056b3; }
     .close-btn { background: none; border: none; color: white; font-size: 28px; cursor: pointer; }
@@ -191,8 +191,17 @@
     function toggleChat() {
         const chatWindow = document.getElementById('chat-widget-window');
         const isHidden = chatWindow.style.display === 'none';
+        
         chatWindow.style.display = isHidden ? 'flex' : 'none';
-        if (isHidden) document.getElementById('user-input').focus();
+        
+        if (isHidden) {
+            // The chat was just opened!
+            document.getElementById('user-input').focus();
+            startNudgeTimer(); // Start the 10-second clock immediately
+        } else {
+            // The chat was just closed!
+            clearTimeout(nudgeTimer); // Pause the clock so it doesn't trigger in the background
+        }
     }
 
     // Toggle Legal Disclaimer text
@@ -208,7 +217,7 @@
         if (event.key === 'Enter') sendMessage();
     }
 
-    // AJAX Call to Python Backend (Gemini 2.5 Flash)
+    // AJAX Call to Python Backend
     async function sendMessage() {
         const input = document.getElementById('user-input');
         const chatBox = document.getElementById('chat-box');
@@ -216,8 +225,8 @@
 
         if (!message) return;
 
-    // --- NEW: Stop the nudge timer because the user responded ---
-    clearTimeout(nudgeTimer);
+        // --- Stop the nudge timer because the user responded ---
+        clearTimeout(nudgeTimer);
 
         // 1. Add User Message to UI
         chatBox.innerHTML += `<div class="msg user">${message}</div>`;
@@ -236,7 +245,7 @@
             // 3. Add Bot Reply to UI
             chatBox.innerHTML += `<div class="msg bot">${data.reply}</div>`;
 
-            // --- NEW: Start the timer again now that the bot has finished speaking ---
+            // --- Start the timer again now that the bot has finished speaking ---
             startNudgeTimer();
 
         } catch (error) {
@@ -248,20 +257,20 @@
     }
 
     function startNudgeTimer() {
-    // Clear any existing timer so they don't stack up
-    clearTimeout(nudgeTimer);
+        // Clear any existing timer so they don't stack up
+        clearTimeout(nudgeTimer);
 
-    // Start a new 10-second countdown
-    nudgeTimer = setTimeout(() => {
-        const chatBox = document.getElementById('chat-box');
-        
-        // Only send the nudge if the window is currently open
-        const chatWindow = document.getElementById('chat-widget-window');
-        if (chatWindow.style.display !== 'none') {
-            chatBox.innerHTML += `<div class="msg bot">I'm here if you have any questions or need help!</div>`;
-            chatBox.scrollTop = chatBox.scrollHeight;
-        }
-    }, 10000); // 10000 milliseconds = 10 seconds
-}
+        // Start a new 10-second countdown
+        nudgeTimer = setTimeout(() => {
+            const chatBox = document.getElementById('chat-box');
+            
+            // Only send the nudge if the window is currently open
+            const chatWindow = document.getElementById('chat-widget-window');
+            if (chatWindow.style.display !== 'none') {
+                chatBox.innerHTML += `<div class="msg bot">I'm here if you have any questions or need help!</div>`;
+                chatBox.scrollTop = chatBox.scrollHeight;
+            }
+        }, 10000); // 10000 milliseconds = 10 seconds
+    }
 </script>
 {% endblock %}
