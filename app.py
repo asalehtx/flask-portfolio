@@ -349,15 +349,15 @@ def finance_dashboard():
     """Renders the frontend dashboard for the finance app."""
     return render_template('finance.html')
 
-@app.route('/api/legal-chat', methods=['POST'])
+@app.route('/api/chat', methods=['POST'])
 def legal_chat():
     data = request.get_json()
     user_message = data.get("message")
     
-    # We use a simple session ID to keep track of different users
+    # Simple session management (later we can pass dynamic IDs from the frontend)
     session_id = data.get("session_id", "demo_user")
 
-    # If this is a new user, start a fresh chat history
+    # Start a fresh chat history if this is a new user
     if session_id not in active_chats:
         active_chats[session_id] = model.start_chat(history=[])
 
