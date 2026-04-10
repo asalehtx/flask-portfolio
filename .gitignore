@@ -1,1 +1,19 @@
-venv
+# Security / Secrets
+.env
+
+# Virtual Environments
+venv/
+.venv/
+env/
+
+# Python Cache
+__pycache__/
+*.pyc
+
+# Operating System Files
+.DS_Store
+Thumbs.db
+
+# Local Databases (Optional)
+*.sqlite3
+instance/
