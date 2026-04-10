@@ -1,114 +1,152 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rahgozar Law Firm | Legal Intake</title>
-    <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; background: #f4f6f8; }
-        
-        /* Fake Law Firm Header */
-        .hero { background: #1a252f; color: white; padding: 60px 20px; text-align: center; border-bottom: 5px solid #d35400; }
-        .hero h1 { margin: 0; font-size: 2.5rem; }
-        .hero p { font-size: 1.2rem; color: #bdc3c7; }
-        .content { padding: 40px 20px; max-width: 800px; margin: auto; text-align: center; color: #2c3e50; }
+{% extends 'base.html' %}
 
-        /* Back to Portfolio Button */
-        .back-btn { display: inline-block; margin-top: 20px; text-decoration: none; background: #34495e; color: white; padding: 10px 20px; border-radius: 5px; }
+{% block content %}
+<div class="demo-container">
+    <h2>AI Legal Intake Agent Demo</h2>
+    <p>Click the chat icon in the bottom right to start a conversation with the AI assistant.</p>
+</div>
 
-        /* Floating Chat Widget */
-        .chat-widget { position: fixed; bottom: 20px; right: 20px; width: 350px; max-width: 90vw; background: white; border-radius: 10px; box-shadow: 0 10px 20px rgba(0,0,0,0.2); display: flex; flex-direction: column; overflow: hidden; border: 1px solid #ddd; }
-        .chat-header { background: #2c3e50; color: white; padding: 15px; font-weight: bold; text-align: center; }
-        .chat-box { height: 350px; overflow-y: auto; padding: 15px; background: #fafafa; display: flex; flex-direction: column; gap: 10px; }
-        
-        /* Chat Bubbles */
-        .msg { max-width: 80%; padding: 10px 15px; border-radius: 15px; font-size: 0.95rem; line-height: 1.4; word-wrap: break-word; }
-        .msg.bot { background: #e0e6ed; color: #2c3e50; align-self: flex-start; border-bottom-left-radius: 2px; }
-        .msg.user { background: #d35400; color: white; align-self: flex-end; border-bottom-right-radius: 2px; }
-        .typing { font-style: italic; color: #7f8c8d; font-size: 0.85rem; align-self: flex-start; margin-left: 10px; display: none; }
+<div id="chat-widget-button" onclick="toggleChat()">
+    <span>💬</span>
+</div>
 
-        /* Input Area */
-        .chat-input-area { display: flex; padding: 10px; border-top: 1px solid #ddd; background: white; }
-        .chat-input-area input { flex: 1; padding: 10px; border: 1px solid #ccc; border-radius: 20px; outline: none; }
-        .chat-input-area button { background: #2c3e50; color: white; border: none; padding: 10px 15px; margin-left: 10px; border-radius: 20px; cursor: pointer; font-weight: bold; }
-        .chat-input-area button:hover { background: #1a252f; }
-    </style>
-</head>
-<body>
-
-    <div class="hero">
-        <h1>Rahgozar Law Firm</h1>
-        <p>Experienced Personal Injury Attorneys. We fight for what you deserve.</p>
-    </div>
-    
-    <div class="content">
-        <h2>Injured? Let us help.</h2>
-        <p>Use the chat widget in the bottom right corner to speak with our intelligent intake assistant immediately.</p>
-        <a href="/" class="back-btn">← Back to Portfolio</a>
+<div id="chat-widget-window" class="chat-container" style="display: none;">
+    <div class="chat-header">
+        <span>Rahgozar Law Assistant</span>
+        <button onclick="toggleChat()" class="close-btn">&minus;</button>
     </div>
 
-    <div class="chat-widget">
-        <div class="chat-header">Legal Intake Assistant</div>
-        <div class="chat-box" id="chatBox">
-            <div class="msg bot">Hi! Thanks for reaching out to Rahgozar Law Firm! How can we help you?</div>
-        </div>
-        <div class="typing" id="typingIndicator">Intake assistant is typing...</div>
-        <div class="chat-input-area">
-            <input type="text" id="userInput" placeholder="Type your message..." onkeypress="handleKeyPress(event)">
-            <button onclick="sendMessage()">Send</button>
-        </div>
+    <div id="chat-box" class="chat-box">
+        <div class="msg bot">Hello! I'm an AI assistant for Rahgozar Law Firm. How can I help you today?</div>
     </div>
 
-    <script>
-        // Generate a random session ID so the AI remembers this specific user's conversation
-        const sessionId = "user_" + Math.floor(Math.random() * 10000);
+    <div class="chat-input-area">
+        <input type="text" id="user-input" placeholder="Type your message..." onkeypress="handleKeyPress(event)" />
+        <button onclick="sendMessage()">Send</button>
+    </div>
+</div>
 
-        function handleKeyPress(e) {
-            if (e.key === 'Enter') {
-                sendMessage();
-            }
-        }
+<style>
+    /* Floating Button Styles */
+    #chat-widget-button {
+        position: fixed;
+        bottom: 30px;
+        right: 30px;
+        width: 65px;
+        height: 65px;
+        background: #007bff;
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: white;
+        font-size: 32px;
+        cursor: pointer;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        z-index: 1000;
+        transition: transform 0.2s;
+    }
+    #chat-widget-button:hover { transform: scale(1.1); }
 
-        async function sendMessage() {
-            const inputField = document.getElementById('userInput');
-            const message = inputField.value.trim();
-            if (!message) return;
+    /* Floating Window Styles */
+    .chat-container {
+        position: fixed;
+        bottom: 110px;
+        right: 30px;
+        width: 380px;
+        height: 550px;
+        max-width: 90vw; /* Responsive for mobile */
+        max-height: 70vh;
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        z-index: 1001;
+    }
 
-            const chatBox = document.getElementById('chatBox');
-            const typingIndicator = document.getElementById('typingIndicator');
+    .chat-header {
+        background: #007bff;
+        color: white;
+        padding: 15px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-weight: bold;
+    }
 
-            // 1. Add User's message to the UI
-            chatBox.innerHTML += `<div class="msg user">${message}</div>`;
-            inputField.value = '';
-            chatBox.scrollTop = chatBox.scrollHeight; // Scroll to bottom
+    .chat-box {
+        flex: 1;
+        overflow-y: auto;
+        padding: 15px;
+        background: #f8f9fa;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
 
-            // 2. Show "typing..." animation
-            typingIndicator.style.display = 'block';
-            chatBox.scrollTop = chatBox.scrollHeight;
+    .msg { padding: 10px 15px; border-radius: 18px; max-width: 80%; line-height: 1.4; }
+    .bot { background: #e9ecef; align-self: flex-start; color: #333; }
+    .user { background: #007bff; color: white; align-self: flex-end; }
 
-            try {
-                // 3. Send message to Flask Backend
-                const response = await fetch('/api/chat', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ message: message, session_id: sessionId })
-                });
-                const data = await response.json();
+    .chat-input-area {
+        padding: 15px;
+        border-top: 1px solid #eee;
+        display: flex;
+        gap: 10px;
+    }
 
-                // 4. Hide "typing..." and add AI's response to the UI
-                typingIndicator.style.display = 'none';
-                if (data.status === 'success') {
-                    chatBox.innerHTML += `<div class="msg bot">${data.reply}</div>`;
-                } else {
-                    chatBox.innerHTML += `<div class="msg bot" style="color: red;">Error connecting to server.</div>`;
-                }
-            } catch (error) {
-                typingIndicator.style.display = 'none';
-                chatBox.innerHTML += `<div class="msg bot" style="color: red;">Connection error.</div>`;
-            }
+    /* PREVENT ZOOM: Font-size MUST be 16px */
+    #user-input {
+        flex: 1;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 20px;
+        font-size: 16px; 
+        outline: none;
+    }
+
+    .close-btn { background: none; border: none; color: white; font-size: 28px; cursor: pointer; }
+</style>
+
+<script>
+    function toggleChat() {
+        const chatWindow = document.getElementById('chat-widget-window');
+        const isHidden = chatWindow.style.display === 'none';
+        chatWindow.style.display = isHidden ? 'flex' : 'none';
+        if (isHidden) document.getElementById('user-input').focus();
+    }
+
+    function handleKeyPress(event) {
+        if (event.key === 'Enter') sendMessage();
+    }
+
+    async function sendMessage() {
+        const input = document.getElementById('user-input');
+        const chatBox = document.getElementById('chat-box');
+        const message = input.value.trim();
+
+        if (!message) return;
+
+        // Append user message
+        chatBox.innerHTML += `<div class="msg user">${message}</div>`;
+        input.value = '';
+        chatBox.scrollTop = chatBox.scrollHeight;
+
+        try {
+            const response = await fetch('/api/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message: message })
+            });
+            const data = await response.json();
             
-            chatBox.scrollTop = chatBox.scrollHeight;
+            chatBox.innerHTML += `<div class="msg bot">${data.reply}</div>`;
+        } catch (error) {
+            chatBox.innerHTML += `<div class="msg bot" style="color: red;">Connection error. Please try again.</div>`;
         }
-    </script>
-</body>
-</html>
+        chatBox.scrollTop = chatBox.scrollHeight;
+    }
+</script>
+{% endblock %}
