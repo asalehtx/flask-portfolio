@@ -185,6 +185,8 @@
 </style>
 
 <script>
+    let nudgeTimer; // This holds the 10-second countdown
+
     // Toggle Chat Window visibility
     function toggleChat() {
         const chatWindow = document.getElementById('chat-widget-window');
@@ -237,5 +239,22 @@
         // 4. Scroll to bottom
         chatBox.scrollTop = chatBox.scrollHeight;
     }
+
+    function startNudgeTimer() {
+    // Clear any existing timer so they don't stack up
+    clearTimeout(nudgeTimer);
+
+    // Start a new 10-second countdown
+    nudgeTimer = setTimeout(() => {
+        const chatBox = document.getElementById('chat-box');
+        
+        // Only send the nudge if the window is currently open
+        const chatWindow = document.getElementById('chat-widget-window');
+        if (chatWindow.style.display !== 'none') {
+            chatBox.innerHTML += `<div class="msg bot">I'm here if you have any questions or need help!</div>`;
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+    }, 10000); // 10000 milliseconds = 10 seconds
+}
 </script>
 {% endblock %}
