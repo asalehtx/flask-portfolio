@@ -10,18 +10,18 @@
         </div>
 
         <div class="project-links">
-            {% if project.live_demo %}
-                <a href="{{ project.live_demo }}" target="_blank" class="button">Test Live API Demo</a>
-            {% endif %}
-        </div>
-        <br/>
-        <div class="project-links">
             {% if project.github_url %}
                 <a href="{{ project.github_url }}" target="_blank" class="button">View Source on GitHub</a>
             {% endif %}
-            </div>
-
             
+            {% if project.live_demo %}
+                <a href="{{ project.live_demo }}" target="_blank" class="button">Test Live API Demo</a>
+            {% endif %}
+
+            {% if project.dashboard_url %}
+                <a href="{{ project.dashboard_url }}" class="button" style="background-color: #28a745; border-color: #28a745;">View Interactive Dashboard</a>
+            {% endif %}
+        </div>    
         
         <br><br>
         <a href="{{ url_for('home') }}">&larr; Back to Projects</a>

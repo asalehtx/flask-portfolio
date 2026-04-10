@@ -78,9 +78,10 @@ PROJECTS = [
         "id": 3,
         "title": "Personal Finance Engine",
         "description": "A financial tracking API that aggregates ledger data, checks spending against dynamic budget limits, issues overspending alerts, and generates downloadable CSV reports.",
-        "tech_stack": ["Python", "Flask", "Data Aggregation", "CSV Generation"],
-        "github_url": "https://github.com/asalehtx/flask-portfolio",
-        "live_demo": "/api/finance/summary" 
+        "tech_stack": ["Python", "Flask", "Chart.js", "CSV Generation"],
+        "github_url": "https://github.com/yourusername/flask-portfolio",
+        "live_demo": "/api/finance/summary",
+        "dashboard_url": "/finance-dashboard"  # <-- ADD THIS LINE
     }
 ]
 
