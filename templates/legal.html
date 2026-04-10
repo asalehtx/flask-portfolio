@@ -21,7 +21,7 @@
             <img src="https://randomuser.me/api/portraits/women/68.jpg" alt="Paralegal Avatar" class="avatar">
             <span>AI Legal Assistant</span>
         </div>
-        <button onclick="toggleChat()" class="close-btn">&minus;</button>
+        <button onclick="toggleChat()" class="close-btn">&times;</button>
     </div>
     </div>
 
@@ -124,23 +124,30 @@
 }
 
 /* Exact 24x24 pixel button */
+/* Circular 'X' close button */
 .close-btn { 
-    background: none; 
+    background: rgba(255, 255, 255, 0.2); /* Creates a subtle, semi-transparent white circle */
     border: none; 
     color: white; 
-    width: 24px;
-    height: 24px;
-    font-size: 24px;
+    width: 28px;           /* Slightly larger to look good as a circle */
+    height: 28px;
+    border-radius: 50%;    /* This makes it a perfect circle */
+    font-size: 20px;       /* Perfect size for the 'X' */
     display: flex;
     justify-content: center;
     align-items: center;
     cursor: pointer; 
     padding: 0;
-    margin-left: auto; /* Pushes to the right */
-    flex-shrink: 0;    /* Prevents squishing */
-    transition: opacity 0.2s; 
+    margin-left: auto;     /* Keeps it locked to the top right */
+    flex-shrink: 0;
+    transition: background 0.2s, transform 0.2s; 
 }
-.close-btn:hover { opacity: 0.7; }
+
+/* Hover effect */
+.close-btn:hover { 
+    background: rgba(255, 255, 255, 0.4); /* Brightens the circle when hovered */
+    transform: scale(1.1); /* Adds a tiny, satisfying "pop" effect */
+}
 
 /* --- 3. Chat Box & Messages --- */
 .chat-box {
