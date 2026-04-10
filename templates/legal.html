@@ -23,9 +23,21 @@
     </div>
 
     <div class="chat-input-area">
+    <div class="disclaimer-container">
+        <div class="disclaimer-header" onclick="toggleDisclaimer()">
+            <span class="law-label">Rahgozar Law AI</span>
+            <span id="disclaimer-arrow">▼</span>
+        </div>
+        <div id="disclaimer-text" class="disclaimer-content">
+            This chat does not create an attorney‑client relationship. Please do not provide any confidential information until such time as an attorney‑client relationship has been established.
+        </div>
+    </div>
+
+    <div class="input-row">
         <input type="text" id="user-input" placeholder="Type your message..." onkeypress="handleKeyPress(event)" />
         <button onclick="sendMessage()">Send</button>
     </div>
+</div>
 </div>
 
 <style>
