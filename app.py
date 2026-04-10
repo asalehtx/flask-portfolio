@@ -2,6 +2,32 @@ import csv
 import io
 from flask import Flask, render_template, jsonify, request, Response
 
+import os
+import google.generativeai as genai
+
+# Tell Gemini to use the API key from your environment variables (we will set this up in Railway later)
+# For local testing, you can temporarily replace os.environ.get(...) with your actual "key" (but delete it before pushing to GitHub!)
+genai.configure(api_key=os.environ.get("GEMINI_API_KEY"))
+
+# Define the AI's strict persona and goal
+law_firm_prompt = """You are the empathetic first point of contact for the Rahgozar Law Firm.
+Your goal is to listen to the user's situation, validate their distress, and determine if they have a viable case.
+Ask ONE gentle follow-up question at a time to find out:
+1) Date of the injury.
+2) Type of accident (e.g., car crash, slip and fall).
+3) If they sought medical treatment.
+Once you have got that info, just ask for their name and phone number so attorney Pegah Rahgozar can give them a call. 
+NEVER give legal advice. If they ask a legal question, politely explain that an attorney will need to answer that during their consultation."""
+
+# Initialize the Gemini model with the system instructions
+model = genai.GenerativeModel(
+    model_name="gemini-1.5-flash",
+    system_instruction=law_firm_prompt
+)
+
+# A simple dictionary to temporarily store active conversations so the AI remembers the context
+active_chats = {}
+
 # ... (your existing code) ...
 
 # --- MOCK DB: FINANCE APP ---
@@ -316,6 +342,31 @@ def export_transactions_csv():
 def finance_dashboard():
     """Renders the frontend dashboard for the finance app."""
     return render_template('finance.html')
+
+@app.route('/api/legal-chat', methods=['POST'])
+def legal_chat():
+    data = request.get_json()
+    user_message = data.get("message")
+    
+    # We use a simple session ID to keep track of different users
+    session_id = data.get("session_id", "demo_user")
+
+    # If this is a new user, start a fresh chat history
+    if session_id not in active_chats:
+        active_chats[session_id] = model.start_chat(history=[])
+
+    chat_session = active_chats[session_id]
+
+    try:
+        # Send the user's message to Gemini
+        response = chat_session.send_message(user_message)
+        
+        # Return Gemini's empathetic response to the frontend
+        return jsonify({"reply": response.text, "status": "success"})
+    
+    except Exception as e:
+        print(f"Gemini API Error: {e}")
+        return jsonify({"reply": "I'm so sorry, we are experiencing a technical issue connecting you right now. Please call our office directly at 832-205-5978.", "status": "error"}), 500
 
 if __name__ == '__main__':
     app.run(debug=True)
