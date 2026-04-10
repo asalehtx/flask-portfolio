@@ -34,34 +34,5 @@ A complete CRUD REST API that allows applications to store, retrieve, modify, an
 Content Feed & Subscription (API)
 A RESTful service implementing a Pub/Sub model. Users can subscribe to topics, retrieve an algorithmically filtered personalized feed of articles, and receive dynamic topic recommendations based on missing subscriptions.
 
-LOCAL INSTALLATION & SETUP
-If you want to run this application locally on your machine, follow these steps in your terminal:
-
-Clone the repository:
-git clone https://github.com/asalehtx/adam-saleh-web-app-portfolio.git
-cd adam-saleh-web-app-portfolio
-
-Create and activate a virtual environment:
-
-Windows:
-python -m venv venv
-venv\Scripts\activate
-
-Mac/Linux:
-python3 -m venv venv
-source venv/bin/activate
-
-Install the dependencies:
-pip install -r requirements.txt
-
-Run the Flask server:
-flask run
-
-(The app will be available at http://127.0.0.1:5000)
-
-DEPLOYMENT
-This application is configured for production deployment using Gunicorn. The included Procfile and requirements.txt allow for seamless deployment on platforms like Railway, Heroku, or Render.
-
-Start Command: gunicorn app:app
 
 Designed and built by Adam Saleh.
