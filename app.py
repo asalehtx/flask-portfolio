@@ -87,6 +87,15 @@ USER_SETTINGS_DB = {
 # Sample data representing your projects
 PROJECTS = [
     {
+        "id": 5,
+        "title": "AI SEO & Accessibility Auditor",
+        "description": "An intelligent web scraping tool that reads live website HTML and leverages the Gemini API to provide actionable SEO and WCAG accessibility improvements.",
+        "tech_stack": ["Python", "Flask", "BeautifulSoup", "Gemini API"],
+        "github_url": "https://github.com/asalehtx/adam-saleh-web-app-portfolio",
+        "dashboard_url": "/seo-auditor",
+        "button_label": "Run an Audit"
+    },
+    {
         "id": 4,
         "title": "AI Legal Intake Agent",
         "description": "An intelligent, empathetic chatbot designed for personal injury law firms. Built using the Google Gemini API, it captures leads, validates user distress, and pre-qualifies potential cases through natural conversation before routing them to a human attorney.",
@@ -304,6 +313,26 @@ def legal_chat():
 @app.route('/legal-chat')
 def legal_chat_page():
     return render_template('legal.html')
+
+# --- SEO AUDITOR ROUTES ---
+@app.route('/seo-auditor')
+def seo_auditor_page():
+    return render_template('seo.html')
+
+@app.route('/api/audit', methods=['POST'])
+def run_audit():
+    data = request.get_json()
+    target_url = data.get('url')
+    
+    # Basic validation
+    if not target_url:
+        return jsonify({"error": "Please provide a valid URL."}), 400
+        
+    # Phase 1 Test: Just return a success message to prove the frontend and backend are talking!
+    return jsonify({
+        "message": f"Success! The backend received the URL: {target_url}. We will add the Web Scraper here in Phase 2.",
+        "status": "success"
+    }), 200
 
 if __name__ == '__main__':
     app.run(debug=True)
