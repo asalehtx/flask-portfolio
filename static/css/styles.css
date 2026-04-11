@@ -176,7 +176,7 @@ h1, h2, h3, h4, h5, h6, .logo {
 .header-profile { display: flex; align-items: center; gap: 12px; flex: 1; min-width: 0; }
 .header-profile span { font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .avatar { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
-.avatar-widget { width: 58px; height: 58px; margin-top: 12px; border-radius: 50%; object-fit: cover; border: 2px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+#chat-widget-button .avatar-widget { width: 58px; height: 58px; margin-top: 12px; border-radius: 50%; object-fit: cover; border: 2px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
 .close-btn { 
     background: rgba(255, 255, 255, 0.2); border: none; color: white; width: 24px; height: 24px;
     min-width: 24px; min-height: 24px; border-radius: 50%; display: flex; justify-content: center;
