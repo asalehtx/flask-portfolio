@@ -68,7 +68,6 @@
         background-color: #121212;
         color: #ffffff;
         font-family: 'Jost', sans-serif;
-        /* Hide regular scrollbar to let the snap container handle scrolling */
         overflow: hidden; 
     }
 
@@ -114,8 +113,9 @@
         transition: all 0.3s ease; 
         cursor: pointer;
         display: inline-block;
+        box-sizing: border-box;
     }
-    .btn-sm { padding: 8px 16px; font-size: 14px; } /* Smaller buttons for cards */
+    .btn-sm { padding: 8px 16px; font-size: 14px; } 
     
     .primary { background: #007bff; color: #fff; border: 2px solid #007bff; }
     .primary:hover { background: #0056b3; border-color: #0056b3; transform: translateY(-2px); }
@@ -126,7 +126,7 @@
     .outline { border: 2px solid #007bff; color: #007bff; }
     .outline:hover { background: #007bff; color: #fff; transform: translateY(-2px); }
 
-    /* --- Dynamic Project Cards (The Jinja Section) --- */
+    /* --- Dynamic Project Cards --- */
     .project-grid {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -166,5 +166,39 @@
         transition: color 0.3s;
     }
     .email-link:hover { color: #fff; }
+
+    /* =========================================
+       MOBILE RESPONSIVE RULES (NEW)
+       ========================================= */
+    @media screen and (max-width: 768px) {
+        /* 1. Scale down typography so it doesn't break out of the screen */
+        .title { font-size: 38px; }
+        .greeting { font-size: 18px; }
+        .subtitle { font-size: 16px; margin-bottom: 30px; }
+        .content h2 { font-size: 32px; }
+        
+        /* Force the email address to wrap if it's too long for the screen */
+        .email-link { font-size: 26px; word-break: break-all; }
+
+        /* 2. Center the Hero text on mobile */
+        .hero-content { text-align: center; }
+
+        /* 3. Stack the buttons vertically and make them full width */
+        .button-group { 
+            flex-direction: column; 
+            gap: 15px; 
+            width: 100%; 
+        }
+        .button-group .btn { 
+            width: 100%; 
+            text-align: center; 
+        }
+
+        /* 4. Force the project grid into a single column so cards don't overflow */
+        .project-grid { 
+            grid-template-columns: 1fr; 
+            gap: 20px;
+        }
+    }
 </style>
 {% endblock %}
