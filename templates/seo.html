@@ -17,7 +17,7 @@
         <div class="card-header">
             <h3>Audit Results</h3>
         </div>
-        <p id="loading-text" style="color: #007bff; display: none; font-weight: 500;">Scraping website data... this may take a few seconds.</p>
+        <p id="loading-text" style="color: #007bff; display: none; font-weight: 500;">Running Google PageSpeed & AI Analysis... This usually takes 10 to 15 seconds.</p>
         <div id="audit-output" style="color: #ccc; line-height: 1.6;"></div>
     </div>
 </div>
@@ -52,8 +52,35 @@
             loadingText.style.display = 'none';
             
             if (response.ok) {
-                // Display the AI-generated HTML report!
+                // Function to assign colors based on Google's standard thresholds
+                const getColor = (score) => {
+                    if (score === "N/A") return "#888"; // Gray for error
+                    if (score >= 90) return "#0cce6b"; // Green
+                    if (score >= 50) return "#ffa400"; // Orange
+                    return "#ff4e42"; // Red
+                };
+
                 let htmlContent = `<p style="color: #2ecc71; font-weight: 600; margin-bottom: 25px;">✅ ${data.message}</p>`;
+                
+                // Add the Visual Scorecards
+                htmlContent += `
+                <div style="display: flex; gap: 20px; justify-content: center; margin-bottom: 30px;">
+                    <div style="text-align: center;">
+                        <div style="width: 80px; height: 80px; border-radius: 50%; border: 6px solid ${getColor(data.performance_score)}; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: bold; color: #fff; margin: 0 auto 10px auto; background: #252525;">
+                            ${data.performance_score}
+                        </div>
+                        <strong style="color: #ccc; font-size: 14px;">Performance</strong>
+                    </div>
+                    
+                    <div style="text-align: center;">
+                        <div style="width: 80px; height: 80px; border-radius: 50%; border: 6px solid ${getColor(data.seo_score)}; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: bold; color: #fff; margin: 0 auto 10px auto; background: #252525;">
+                            ${data.seo_score}
+                        </div>
+                        <strong style="color: #ccc; font-size: 14px;">SEO Score</strong>
+                    </div>
+                </div>`;
+
+                // Add the AI Report
                 htmlContent += `<div class="ai-report-content" style="color: #eee;">${data.report}</div>`;
                 
                 output.innerHTML = htmlContent;

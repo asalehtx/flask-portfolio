@@ -45,18 +45,23 @@ active_chats = {}
 
 # --- SEO AUDITOR AI SETUP ---
 seo_prompt = """You are an expert Technical SEO and WCAG Accessibility Auditor.
-Review the provided scraped website data. Provide a brief, professional analysis.
+Review the provided scraped website data, including the Google Lighthouse Performance and SEO scores. 
+Provide a brief, professional analysis.
+
 CRITICAL: Structure your response entirely in raw HTML format (using <h3>, <p>, <ul>, <li>, and <strong> tags). Do NOT use Markdown formatting like ** or ##. 
 
-Include these three sections exactly:
+Include these four sections exactly:
+<h3>📊 Score Analysis</h3>
+(Provide a 1-2 sentence breakdown of their Lighthouse Performance and SEO scores. Explain what these numbers mean for the user experience and search ranking in plain English.)
+
 <h3>🟢 What Looks Good</h3>
-(List what they did right based on the data)
+(List what they did right based on the scraped data and scores)
 
 <h3>🔴 Areas for Improvement</h3>
-(List what is missing or problematic, especially missing Alt text or H1s)
+(List what is missing or problematic, highlighting specific scraped data like missing Alt text, H1s, or low performance metrics)
 
 <h3>🚀 Actionable Next Steps</h3>
-(Provide 2-3 specific, non-generic steps the webmaster should take immediately)
+(Provide 2-3 specific, non-generic steps the webmaster should take immediately to improve their scores, SEO, and accessibility)
 """
 
 seo_model = genai.GenerativeModel(
@@ -376,9 +381,29 @@ def run_audit():
         images = soup.find_all('img')
         missing_alt_count = sum(1 for img in images if not img.get('alt'))
         
-        # 5. Format the scraped data into a readable string for the AI
+        # 5. Fetch Official Google PageSpeed Insights (PSI) Scores
+        # Note: Google's API can take 10-15 seconds to analyze a page
+        psi_url = f"https://www.googleapis.com/pagespeedonline/v5/runPagespeed?url={target_url}&category=performance&category=seo"
+        try:
+            psi_response = requests.get(psi_url, timeout=30)
+            psi_data = psi_response.json()
+            
+            # Google returns scores as decimals (e.g., 0.92 = 92)
+            lighthouse = psi_data.get('lighthouseResult', {}).get('categories', {})
+            
+            # Safely extract scores, defaulting to "N/A" if Google blocks the request
+            perf_score = int(lighthouse.get('performance', {}).get('score', 0) * 100) if lighthouse.get('performance') else "N/A"
+            seo_score = int(lighthouse.get('seo', {}).get('score', 0) * 100) if lighthouse.get('seo') else "N/A"
+            
+        except Exception as e:
+            print(f"PageSpeed API Error: {e}")
+            perf_score, seo_score = "N/A", "N/A"
+
+        # 6. Format the scraped data AND new scores into a readable string for the AI
         ai_input = f"""
         Website Analyzed: {target_url}
+        Google Lighthouse SEO Score: {seo_score}/100
+        Google Lighthouse Performance Score: {perf_score}/100
         Title: {title}
         Meta Description: {meta_desc}
         H1 Tags: {', '.join(h1_tags) if h1_tags else 'None'}
@@ -386,7 +411,7 @@ def run_audit():
         Images missing Alt Text: {missing_alt_count} out of {len(images)}
         """
         
-        # 6. Ask Gemini to analyze the data and generate the HTML report
+        # 7. Ask Gemini to analyze the data
         try:
             ai_response = seo_model.generate_content(ai_input)
             report_html = ai_response.text
@@ -394,10 +419,12 @@ def run_audit():
             print(f"Gemini AI Error: {e}")
             return jsonify({"error": "Failed to generate AI analysis."}), 500
         
-        # 7. Send the finalized AI HTML report back to the frontend
+        # 8. Send the scores AND the AI HTML report back to the frontend
         return jsonify({
-            "message": "Audit complete! Here is your AI analysis.",
+            "message": "Audit complete! Here is your technical analysis.",
             "report": report_html,
+            "performance_score": perf_score,
+            "seo_score": seo_score,
             "status": "success"
         }), 200
 
