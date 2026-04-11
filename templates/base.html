@@ -8,14 +8,14 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Jost:wght@400;500;600&display=swap" rel="stylesheet">
     
     <style>
-        /* 2. Global Reset (Overrides browser defaults) */
+        /* Global Reset */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
 
-        /* 3. Global Dark Mode & Font Settings */x
+        /* Global Dark Mode & Font Settings */
         body, html {
             background-color: #121212;
             color: #ffffff;
@@ -28,7 +28,7 @@
             font-family: 'Poppins', sans-serif;
         }
 
-        /* 4. Global Fixed Navbar */
+        /* --- Desktop Navbar Styles --- */
         .navbar {
             position: fixed;
             top: 0;
@@ -40,7 +40,7 @@
             padding: 20px 50px;
             background: rgba(18, 18, 18, 0.85); /* Frost effect background */
             backdrop-filter: blur(10px);        /* Frost effect blur */
-            z-index: 2000; /* Ensures it always stays on top of content */
+            z-index: 2000; 
         }
 
         .logo { 
@@ -50,9 +50,7 @@
             text-decoration: none;
         }
         
-        .logo span {
-            color: #007bff; /* Blue accent dot */
-        }
+        .logo span { color: #007bff; }
 
         .nav-links { 
             list-style: none; 
@@ -67,8 +65,71 @@
             transition: color 0.3s; 
         }
 
-        .nav-links a:hover { 
-            color: #007bff; 
+        .nav-links a:hover { color: #007bff; }
+
+        /* --- Mobile Hamburger Icon (Hidden on Desktop) --- */
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            cursor: pointer;
+            gap: 5px;
+            z-index: 2001; /* Keeps the button above the sliding menu */
+        }
+
+        .hamburger span {
+            width: 25px;
+            height: 3px;
+            background-color: #ffffff;
+            border-radius: 3px;
+            transition: all 0.3s ease;
+        }
+
+        /* --- Mobile Responsive Rules --- */
+        @media screen and (max-width: 768px) {
+            .navbar { padding: 20px; }
+            
+            /* Show the hamburger icon */
+            .hamburger { display: flex; }
+
+            /* Turn the nav links into a slide-down menu */
+            .nav-links {
+                position: absolute;
+                top: 70px; /* Places it directly under the navbar */
+                left: 0;
+                width: 100%;
+                background: rgba(18, 18, 18, 0.95); /* Deeper background for readability */
+                backdrop-filter: blur(15px);
+                flex-direction: column;
+                text-align: center;
+                gap: 0;
+                
+                /* Animation properties */
+                max-height: 0;
+                overflow: hidden;
+                transition: max-height 0.3s ease-out;
+                border-bottom: 1px solid transparent;
+            }
+
+            /* The class we toggle with Javascript to open the menu */
+            .nav-links.active {
+                max-height: 250px; /* Opens the menu */
+                border-bottom: 1px solid #333;
+            }
+
+            .nav-links li {
+                padding: 15px 0;
+            }
+
+            /* Hamburger 'X' Animation */
+            .hamburger.active span:nth-child(1) {
+                transform: translateY(8px) rotate(45deg);
+            }
+            .hamburger.active span:nth-child(2) {
+                opacity: 0;
+            }
+            .hamburger.active span:nth-child(3) {
+                transform: translateY(-8px) rotate(-45deg);
+            }
         }
     </style>
 </head>
@@ -76,15 +137,42 @@
 
     <nav class="navbar">
         <a href="{{ url_for('home') }}" class="logo">Adam<span>.</span></a>
-        <ul class="nav-links">
-            <li><a href="{{ url_for('home') }}#hero">Home</a></li>
-            <li><a href="{{ url_for('home') }}#about">About</a></li>
-            <li><a href="{{ url_for('home') }}#projects">Projects</a></li>
-            <li><a href="{{ url_for('home') }}#contact">Contact</a></li>
+        
+        <div class="hamburger" onclick="toggleMenu()">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+
+        <ul class="nav-links" id="nav-menu">
+            <li><a href="{{ url_for('home') }}#hero" onclick="closeMenu()">Home</a></li>
+            <li><a href="{{ url_for('home') }}#about" onclick="closeMenu()">About</a></li>
+            <li><a href="{{ url_for('home') }}#projects" onclick="closeMenu()">Projects</a></li>
+            <li><a href="{{ url_for('home') }}#contact" onclick="closeMenu()">Contact</a></li>
         </ul>
     </nav>
 
     {% block content %}{% endblock %}
 
+    <script>
+        function toggleMenu() {
+            const navMenu = document.getElementById('nav-menu');
+            const hamburger = document.querySelector('.hamburger');
+            
+            navMenu.classList.toggle('active');
+            hamburger.classList.toggle('active');
+        }
+
+        // This ensures the menu automatically folds away when the user taps a link
+        function closeMenu() {
+            const navMenu = document.getElementById('nav-menu');
+            const hamburger = document.querySelector('.hamburger');
+            
+            if (navMenu.classList.contains('active')) {
+                navMenu.classList.remove('active');
+                hamburger.classList.remove('active');
+            }
+        }
+    </script>
 </body>
 </html>
