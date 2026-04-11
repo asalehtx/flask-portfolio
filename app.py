@@ -43,6 +43,27 @@ model = genai.GenerativeModel(
 # Temporary memory to keep track of active user sessions
 active_chats = {}
 
+# --- SEO AUDITOR AI SETUP ---
+seo_prompt = """You are an expert Technical SEO and WCAG Accessibility Auditor.
+Review the provided scraped website data. Provide a brief, professional analysis.
+CRITICAL: Structure your response entirely in raw HTML format (using <h3>, <p>, <ul>, <li>, and <strong> tags). Do NOT use Markdown formatting like ** or ##. 
+
+Include these three sections exactly:
+<h3>🟢 What Looks Good</h3>
+(List what they did right based on the data)
+
+<h3>🔴 Areas for Improvement</h3>
+(List what is missing or problematic, especially missing Alt text or H1s)
+
+<h3>🚀 Actionable Next Steps</h3>
+(Provide 2-3 specific, non-generic steps the webmaster should take immediately)
+"""
+
+seo_model = genai.GenerativeModel(
+    model_name="gemini-2.5-flash",
+    system_instruction=seo_prompt
+)
+
 
 # --- MOCK DATABASES ---
 
@@ -354,20 +375,28 @@ def run_audit():
         images = soup.find_all('img')
         missing_alt_count = sum(1 for img in images if not img.get('alt'))
         
-        # 5. Package the scraped data into a dictionary
-        scraped_data = {
-            "title": title,
-            "meta_description": meta_desc,
-            "h1_tags": h1_tags,
-            "h2_count": h2_count,
-            "total_images": len(images),
-            "images_missing_alt": missing_alt_count
-        }
+        # 5. Format the scraped data into a readable string for the AI
+        ai_input = f"""
+        Website Analyzed: {target_url}
+        Title: {title}
+        Meta Description: {meta_desc}
+        H1 Tags: {', '.join(h1_tags) if h1_tags else 'None'}
+        H2 Count: {h2_count}
+        Images missing Alt Text: {missing_alt_count} out of {len(images)}
+        """
         
-        # 6. Send the raw data back to the frontend to verify it worked!
+        # 6. Ask Gemini to analyze the data and generate the HTML report
+        try:
+            ai_response = seo_model.generate_content(ai_input)
+            report_html = ai_response.text
+        except Exception as e:
+            print(f"Gemini AI Error: {e}")
+            return jsonify({"error": "Failed to generate AI analysis."}), 500
+        
+        # 7. Send the finalized AI HTML report back to the frontend
         return jsonify({
-            "message": "Successfully scraped the website!",
-            "data": scraped_data,
+            "message": "Audit complete! Here is your AI analysis.",
+            "report": report_html,
             "status": "success"
         }), 200
 

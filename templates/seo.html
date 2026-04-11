@@ -52,16 +52,9 @@
             loadingText.style.display = 'none';
             
             if (response.ok) {
-                // Display the scraped data from Python!
-                let htmlContent = `<p style="color: #2ecc71; font-weight: 600; margin-bottom: 15px;">✅ ${data.message}</p>`;
-                
-                htmlContent += `<div style="background: #252525; padding: 20px; border-radius: 8px; border: 1px solid #444; font-family: monospace; font-size: 14px;">`;
-                htmlContent += `<p><strong style="color: #007bff;">Page Title:</strong> ${data.data.title}</p>`;
-                htmlContent += `<p><strong style="color: #007bff;">Meta Description:</strong> ${data.data.meta_description}</p>`;
-                htmlContent += `<p><strong style="color: #007bff;">H1 Tags Found:</strong> ${data.data.h1_tags.join(', ') || 'None!'}</p>`;
-                htmlContent += `<p><strong style="color: #007bff;">Total H2 Tags:</strong> ${data.data.h2_count}</p>`;
-                htmlContent += `<p><strong style="color: #007bff;">Accessibility Alert:</strong> ${data.data.images_missing_alt} out of ${data.data.total_images} images are missing ALT text.</p>`;
-                htmlContent += `</div>`;
+                // Display the AI-generated HTML report!
+                let htmlContent = `<p style="color: #2ecc71; font-weight: 600; margin-bottom: 25px;">✅ ${data.message}</p>`;
+                htmlContent += `<div class="ai-report-content" style="color: #eee;">${data.report}</div>`;
                 
                 output.innerHTML = htmlContent;
             } else {
