@@ -82,20 +82,24 @@
     }
 
     .snap-section {
-        height: 100vh;
+        min-height: 100vh; /* CHANGED: Allows section to expand if content is massive on mobile */
         width: 100%;
         scroll-snap-align: start;
         display: flex;
         justify-content: center;
-        align-items: center;
-        padding: 0 20px;
+        /* Removed align-items: center; to prevent the tall-content flexbox bug */
+        padding: 100px 20px 40px 20px; /* Top padding guarantees content never hides behind the Navbar */
         box-sizing: border-box;
     }
 
     .bg-alt { background-color: #1a1a1a; }
 
     /* --- Text Styling --- */
-    .content { max-width: 800px; width: 100%; }
+    .content { 
+        max-width: 800px; 
+        width: 100%; 
+        margin: auto 0; /* Safely centers the content vertically, but allows scrolling if it overflows */
+    }
     .hero-content { text-align: left; }
     .text-center { text-align: center; }
 
