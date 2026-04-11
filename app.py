@@ -14,6 +14,14 @@ genai.configure(api_key=os.environ.get("GEMINI_API_KEY"))
 # Initialize the Flask app ONLY ONCE
 app = Flask(__name__)
 
+@app.before_request
+def redirect_railway_to_custom():
+    # Check if the user is accessing the site via the old Railway URL
+    if request.host == 'adam-saleh-web-app-portfolio.up.railway.app':
+        # Instantly bounce them to the custom domain, keeping the rest of the URL intact
+        # (e.g., /finance stays /finance)
+        return redirect('https://hearhear.agency' + request.full_path, code=301)
+
 # --- AI CHATBOT SETUP ---
 law_firm_prompt = """You are the empathetic first point of contact for the Rahgozar Law Firm.
 Your goal is to listen to the user's situation, validate their distress, and determine if they have a viable case.
