@@ -382,21 +382,31 @@ def run_audit():
         missing_alt_count = sum(1 for img in images if not img.get('alt'))
         
         # 5. Fetch Official Google PageSpeed Insights (PSI) Scores
-        # Note: Google's API can take 10-15 seconds to analyze a page
+        pagespeed_key = os.environ.get("PAGESPEED_API_KEY")
+        
+        # Build the URL. If you have a key, attach it!
         psi_url = f"https://www.googleapis.com/pagespeedonline/v5/runPagespeed?url={target_url}&category=performance&category=seo"
+        if pagespeed_key:
+            psi_url += f"&key={pagespeed_key}"
+            
         try:
-            psi_response = requests.get(psi_url, timeout=30)
+            # Increased timeout to 40s because Google's Lighthouse is slow
+            psi_response = requests.get(psi_url, timeout=40)
             psi_data = psi_response.json()
             
-            # Google returns scores as decimals (e.g., 0.92 = 92)
-            lighthouse = psi_data.get('lighthouseResult', {}).get('categories', {})
-            
-            # Safely extract scores, defaulting to "N/A" if Google blocks the request
-            perf_score = int(lighthouse.get('performance', {}).get('score', 0) * 100) if lighthouse.get('performance') else "N/A"
-            seo_score = int(lighthouse.get('seo', {}).get('score', 0) * 100) if lighthouse.get('seo') else "N/A"
-            
+            # Check if Google sent back an error instead of data
+            if 'error' in psi_data:
+                print(f"PageSpeed API Blocked us: {psi_data['error'].get('message')}")
+                perf_score, seo_score = "N/A", "N/A"
+            else:
+                lighthouse = psi_data.get('lighthouseResult', {}).get('categories', {})
+                
+                # Safely extract scores
+                perf_score = int(lighthouse.get('performance', {}).get('score', 0) * 100) if lighthouse.get('performance') else "N/A"
+                seo_score = int(lighthouse.get('seo', {}).get('score', 0) * 100) if lighthouse.get('seo') else "N/A"
+                
         except Exception as e:
-            print(f"PageSpeed API Error: {e}")
+            print(f"PageSpeed Request Failed: {e}")
             perf_score, seo_score = "N/A", "N/A"
 
         # 6. Format the scraped data AND new scores into a readable string for the AI
